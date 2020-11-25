@@ -23,12 +23,12 @@ td {
     text-align: center;
 }
 
-.card {
-    text-align: center;
+p{
+    margin-bottom: 0;
 }
 
-.action-bar {
-    display: flex;
+.card {
+    text-align: center;
 }
 
 #todo-header {
@@ -53,6 +53,13 @@ td {
 
 .btn-outline-secondary {
     margin: 15px 5px;
+}
+
+.btn-light{
+    background-color: transparent;
+    border: none;
+    max-width: 50px;
+    align-self: center;
 }
 
 #add-task-popup {
