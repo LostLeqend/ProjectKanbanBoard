@@ -19,5 +19,17 @@ router.get('/add', async function () {
     await writeJson(result);
 });
 
+router.get('/delete', async function () {
+    // TODO: Add params for id
+    const id = 1;
+    const result = await json();
+    const task = result.find(function (task) {
+        return task.id = id;
+    });
+    const index = result.indexOf(task);
+    result.splice(index, 1);
+    await writeJson(result);
+});
+
 app.use(router.routes());
 await app.listen({port:8000});
