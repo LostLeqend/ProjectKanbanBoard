@@ -31,5 +31,15 @@ router.get('/delete', async function () {
     await writeJson(result);
 });
 
+let json = async function () {
+    const json = await Deno.readTextFile(jsonStoragePath);
+    return JSON.parse(json);
+}
+
+async function writeJson(data) {
+    const json = JSON.stringify(data);
+    await Deno.writeTextFile(jsonStoragePath, json);
+}
+
 app.use(router.routes());
 await app.listen({port:8000});
