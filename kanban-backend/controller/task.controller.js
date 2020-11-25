@@ -9,5 +9,15 @@ router.get('/fetch', async function () {
     return await json();
 });
 
+router.get('/add', async function () {
+    const result = await json();
+    const task = new Task();
+    task.id = result.length + 1;
+    task.state = State.IN_PROGRESS;
+    task.title = 'test';
+    result.push(task);
+    await writeJson(result);
+});
+
 app.use(router.routes());
 await app.listen({port:8000});
