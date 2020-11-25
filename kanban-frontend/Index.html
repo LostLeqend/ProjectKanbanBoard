@@ -23,7 +23,7 @@
             <td class="background-td">
 
                 <div class="card" style="width:100%">
-                    <p id="txtTaskName">TaskName</p><br>
+                    <p id="txtTaskName">TaskName</p>
 
                     <div class="action-bar">
                         <button class="btn btn-light" id="btnMoveTaskLeft" style="width:33.3%">left</button>
@@ -43,17 +43,16 @@
         </tr>
     </table>
 
-    <div id="myModal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <p>Some text in the Modal..</p>
+    <div id="add-task-popup">
+        <div id="add-task-content">
+            <input class="form-control" id="txt-taskname" type="text">
+           
+            <button class="btn btn-primary" id="btn-add">Add</button>
+            <button id="btn-close">&times;</button>
         </div>
-      
-      </div>
+    </div>
 
-      <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
