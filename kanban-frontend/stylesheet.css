@@ -27,6 +27,10 @@ td {
     text-align: center;
 }
 
+.action-bar{
+    display: flex;
+}
+
 #todo-header {
     background-color: orange;
 }
