@@ -31,16 +31,22 @@ p{
     text-align: center;
 }
 
-#todo-header {
+.header-todo {
     background-color: orange;
+    width: 33%;
+    text-align: center;
 }
 
-#inprogress-header {
+.header-inProgress {
     background-color: deepskyblue;
+    width: 33%;
+    text-align: center;
 }
 
-#done-header {
+.header-done {
     background-color: #47CC8A;
+    width: 33%;
+    text-align: center;
 }
 
 .alternatebackground-td {
