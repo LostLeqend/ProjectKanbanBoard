@@ -5,13 +5,11 @@ import {State} from "../classes/State.js";
 
 const app = new Application();
 const router = new Router();
-const jsonStoragePath = './../persistence/storage.json';
 
 const tasks = [];
 let id = 1;
 
 router.get('/fetch', async function (context) {
-    console.log('fetch', tasks);
     context.response.body = JSON.stringify(tasks);
     context.response.status = 200;
 });
@@ -34,16 +32,24 @@ router.post('/add', async (context) => {
         id++;
         context.response.state = 200;
         context.response();
+    } else {
+        context.response.state = 400;
+        context.response();
     }
 });
 
 router.post('/delete/:id', async (context) => {
     if (context.params && context.params.id) {
         const task = tasks.find(function (task) {
-            return task.id = context.params.id;
+            return task.id == context.params.id;
         });
         const index = tasks.indexOf(task);
         tasks.splice(index, 1);
+        context.response.state = 200;
+        context.response();
+    } else {
+        context.response.state = 400;
+        context.response();
     }
 });
 
@@ -51,24 +57,14 @@ router.post('/move', async (context) => {
     if (context.request.hasBody) {
         const body = JSON.parse(await context.request.body().value);
         const task = tasks.find(function (task) {
-            return task.id = body.id;
+            return task.id == body.id;
         });
         task.state = body.state;
+    } else {
+        context.response.state = 200;
+        context.response();
     }
 });
-
-let json = async function () {
-    let json = await Deno.readFile('./persistence/storage.json');
-    return JSON.parse(json);
-}
-
-async function writeJson(data) {
-    console.log('test');
-    const json = JSON.stringify(data);
-    console.log(json);
-    await Deno.writeTextFile(jsonStoragePath, json);
-}
-
 app.use(
     oakCors({
         origin: "http://127.0.0.1:5500",

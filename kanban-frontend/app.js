@@ -13,35 +13,44 @@ window.addEventListener('load', async () => {
     tasks = await getTasks();
 
     for (let i = 0; i < columns.length; i++) {
-        const th = document.createElement('th');
-        th.className = "header-" + columns[i];
-        th.id = "header-" + columns[i];
-        th.textContent = columns[i];
-        document.getElementById('table-header').appendChild(th);
-
-        const td = document.createElement('td')
-        td.classList.add ("dropzone");
-        td.id = "td-" + columns[i];
-        if (i % 2 !== 0) {
-            td.classList.add("alternatebackground-td");
-        } else {
-            td.classList.add("background-td");
-        }
-        document.getElementById('table-body').appendChild(td);
-
-        const button = document.createElement('button');
-        button.classList.add("btn")
-        button.classList.add("btn-add")
-        button.classList.add("btn-outline-secondary")
-        button.textContent = "+"
-        button.id = columns[i];
-        button.addEventListener('click', (listener) => openTaskPopUp(listener))
-        td.appendChild(button);
+        createTableHeaders(columns[i]);
+        const td = createTableData(columns[i], i);
+        createAddButtons(td, columns[i]);
     }
+    await updateTableCards();
+
 });
 
-function buildTable() {
+function createTableData(state, index) {
+    const td = document.createElement('td')
+    td.classList.add("dropzone");
+    td.id = state;
+    if (index % 2 !== 0) {
+        td.classList.add("alternatebackground-td");
+    } else {
+        td.classList.add("background-td");
+    }
+    document.getElementById('table-body').appendChild(td);
+    return td;
+}
 
+function createTableHeaders(state) {
+    const th = document.createElement('th');
+    th.className = "header-" + state;
+    th.id = "header-" + state;
+    th.textContent = state;
+    document.getElementById('table-header').appendChild(th);
+}
+
+function createAddButtons(parentElement, state) {
+    const button = document.createElement('button');
+    button.classList.add("btn")
+    button.classList.add("btn-add")
+    button.classList.add("btn-outline-secondary")
+    button.textContent = "+"
+    button.id = state;
+    button.addEventListener('click', (listener) => openTaskPopUp(listener))
+    parentElement.appendChild(button);
 }
 
 function openTaskPopUp(listener) {
@@ -49,10 +58,6 @@ function openTaskPopUp(listener) {
     addTaskDto.state = listener.target.id;
     addTaskPopup.style.display = "block";
 }
-
-// document.getElementById('btnDeleteTask').addEventListener('click', async (listener) => {
-//     await deleteTask(listener.target.offsetParent.childNodes[3].innerHTML);
-// });
 
 // When the user clicks on button (x), close the addTaskPopup
 document.getElementById("btn-close").addEventListener('click', () => {
@@ -83,12 +88,16 @@ document.addEventListener("dragover", function (event) {
     event.preventDefault();
 }, false);
 
-document.addEventListener("drop", function (event) {
+document.addEventListener("drop", async function (event) {
     event.preventDefault();
     if (event.target.className.includes("dropzone")) {
         event.target.style.background = "";
         startingDropzone.parentNode.removeChild(startingDropzone);
         event.target.insertBefore(startingDropzone, event.target.firstChild);
+        await moveTask({
+            id: event.target.childNodes[0].childNodes[1].innerHTML,
+            state: event.target.id
+        });
     }
 }, false);
 
@@ -97,85 +106,76 @@ async function addTask(dto) {
     await fetch('http://localhost:8000/add', {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
         body: JSON.stringify(dto)
     });
-    updateTableCards();
+    await updateTableCards();
 }
 
 async function deleteTask(id) {
+    console.log(id);
     await fetch('http://localhost:8000/delete/' + id, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    });
+    await updateTableCards();
+}
+
+async function moveTask(data) {
+    await fetch('http://localhost:8000/move', {
+        method: 'POST',
+        body: JSON.stringify(data)
     });
 }
 
-async function moveTask() {
-    const data = {
-        id: 5,
-        state: 'done',
-    }
-    await fetch('http://localhost:8000/move', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+function createCard() {
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.id = 'draggable';
+    div.draggable = true;
+    return div;
+}
+
+function createCardContext(card, task) {
+    const p1 = document.createElement('p');
+    p1.textContent = task.title;
+
+    const p2 = document.createElement('p');
+    p2.textContent = task.id;
+
+    card.appendChild(p1);
+    card.appendChild(p2);
+}
+
+function createCardTrashButton(div, task) {
+    const button = document.createElement('button');
+    button.classList.add('btn');
+    button.classList.add('btn-light');
+    button.id = 'btnDeleteTask';
+    button.addEventListener('click', () => deleteTask(task.id));
+
+    const trash = document.createElement('i');
+    trash.classList.add('fa');
+    trash.classList.add('fa-trash');
+
+    button.appendChild(trash);
+    div.appendChild(button);
 }
 
 async function updateTableCards() {
     tasks = await getTasks();
     columns = await getColumns();
 
-
-
-    for(let i = 0; i < columns.length; i++) {
-        const button = document.createElement('button');
-        button.classList.add("btn")
-        button.classList.add("btn-add")
-        button.classList.add("btn-outline-secondary")
-        button.textContent = "+"
-        button.id = columns[i];
-        button.addEventListener('click', (listener) => openTaskPopUp(listener));
-        document.getElementById('td-' + columns[i]).innerHTML = "";
-        document.getElementById('td-' + columns[i]).appendChild(button);
+    for (let i = 0; i < columns.length; i++) {
+        document.getElementById(columns[i]).innerHTML = '';
+        createAddButtons(document.getElementById(columns[i]), columns[i]);
         const result = tasks.filter((task) => {
             return task.state === columns[i];
         })
-        const td = document.getElementById('td-' + columns[i]);
+        const td = document.getElementById(columns[i]);
         for (let x = 0; x < result.length; x++) {
-            const div = document.createElement('div');
-            div.classList.add('card');
-            div.id = 'draggable';
-            div.draggable = true;
-
-            const p1 = document.createElement('p');
-            p1.textContent = result[x].title;
-
-            const p2 = document.createElement('p');
-            p2.textContent = result[x].id;
-
-            const button = document.createElement('button');
-            button.classList.add('btn');
-            button.classList.add('btn-light');
-            button.id = 'btnDeleteTask';
-            button.addEventListener('click', () => deleteTask(result[x].id));
-
-            const trash = document.createElement('i');
-            trash.classList.add('fa');
-            trash.classList.add('fa-trash');
-
-            div.appendChild(p1);
-            div.appendChild(p2);
-            button.appendChild(trash);
-            div.appendChild(button);
+            const div = createCard();
+            createCardContext(div, result[x]);
+            createCardTrashButton(div, result[x]);
             td.appendChild(div);
         }
     }
