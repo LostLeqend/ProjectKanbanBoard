@@ -28,17 +28,16 @@ router.post('/add', async (context) => {
         task.state = body.state;
         task.id = id;
         tasks.push(task);
-        console.log(tasks);
         id++;
         context.response.state = 200;
-        context.response();
+        context.response.body = 'Task with id: ' + id + 'has been created';
     } else {
         context.response.state = 400;
-        context.response();
+        context.response.body = 'Request has no body';
     }
 });
 
-router.post('/delete/:id', async (context) => {
+router.delete('/delete/:id', async (context) => {
     if (context.params && context.params.id) {
         const task = tasks.find(function (task) {
             return task.id == context.params.id;
@@ -46,10 +45,10 @@ router.post('/delete/:id', async (context) => {
         const index = tasks.indexOf(task);
         tasks.splice(index, 1);
         context.response.state = 200;
-        context.response();
+        context.response.body = 'Item with id ' + context.params.id + ' was deleted';
     } else {
         context.response.state = 400;
-        context.response();
+        context.response.body = "No parameter found"
     }
 });
 
@@ -60,23 +59,19 @@ router.post('/move', async (context) => {
             return task.id == body.id;
         });
         task.state = body.state;
-    } else {
         context.response.state = 200;
-        context.response();
+        context.response.body = 'Task with id:' + body.id + ' has been updated with state:' + body.state;
+    } else {
+        context.response.state = 400;
+        context.response.body = 'Request has no body';
     }
 });
 app.use(
-    oakCors({
-        origin: "http://127.0.0.1:5500",
-        optionsSuccessStatus: 200
-    }),
+    oakCors()
+    // oakCors({
+    //     origin: "http://127.0.0.1:5500",
+    //     optionsSuccessStatus: 200
+    // }),
 );
 app.use(router.routes());
-
-// Logger
-app.use(async (ctx, next) => {
-    await next();
-    const rt = ctx.response.headers.get("X-Response-Time");
-    console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`);
-});
 await app.listen({port: 8000});

@@ -114,8 +114,7 @@ async function addTask(dto) {
 async function deleteTask(id) {
     console.log(id);
     await fetch('http://localhost:8000/delete/' + id, {
-        method: 'POST',
-        mode: 'no-cors',
+        method: 'DELETE',
     });
     await updateTableCards();
 }
