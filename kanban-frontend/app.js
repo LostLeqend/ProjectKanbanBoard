@@ -18,7 +18,6 @@ window.addEventListener('load', async () => {
         createAddButtons(td, columns[i]);
     }
     await updateTableCards();
-
 });
 
 function createTableData(state, index) {
@@ -53,24 +52,29 @@ function createAddButtons(parentElement, state) {
     parentElement.appendChild(button);
 }
 
+///Popup
 function openTaskPopUp(listener) {
     console.log(listener.target);
     addTaskDto.state = listener.target.id;
     addTaskPopup.style.display = "block";
 }
 
-// When the user clicks on button (x), close the addTaskPopup
 document.getElementById("btn-close").addEventListener('click', () => {
     addTaskPopup.style.display = "none";
 });
 
 document.getElementById("btn-add").addEventListener('click', async (listener) => {
+
     addTaskDto.title = document.getElementById("txt-taskname").value;
+
+    if (addTaskDto.title.trim() == "")
+        return;
+
+    document.getElementById("txt-taskname").value = "";
     await addTask(addTaskDto);
     addTaskPopup.style.display = "none";
 });
 
-// When the user clicks anywhere outside of the addTaskPopup, close it
 window.onclick = function (event) {
     if (event.target == addTaskPopup) {
         addTaskPopup.style.display = "none";
@@ -88,15 +92,29 @@ document.addEventListener("dragover", function (event) {
     event.preventDefault();
 }, false);
 
+function findParentNodeByClass(element, className) {
+    while (element.parentNode) {
+        if (element.className.includes(className)) {
+            return element;
+        }
+        element = element.parentNode;
+    }
+
+    return null;
+}
+
 document.addEventListener("drop", async function (event) {
     event.preventDefault();
-    if (event.target.className.includes("dropzone")) {
-        event.target.style.background = "";
+
+    var dropzone = findParentNodeByClass(event.target, "dropzone");
+
+    if (dropzone != null) {
+        dropzone.style.background = "";
         startingDropzone.parentNode.removeChild(startingDropzone);
-        event.target.insertBefore(startingDropzone, event.target.firstChild);
+        dropzone.insertBefore(startingDropzone, dropzone.firstChild);
         await moveTask({
-            id: event.target.childNodes[0].childNodes[1].innerHTML,
-            state: event.target.id
+            id: dropzone.childNodes[0].childNodes[1].innerHTML,
+            state: dropzone.id
         });
     }
 }, false);
@@ -140,6 +158,7 @@ function createCardContext(card, task) {
 
     const p2 = document.createElement('p');
     p2.textContent = task.id;
+    p2.style.display = 'none';
 
     card.appendChild(p1);
     card.appendChild(p2);
@@ -175,7 +194,7 @@ async function updateTableCards() {
             const div = createCard();
             createCardContext(div, result[x]);
             createCardTrashButton(div, result[x]);
-            td.appendChild(div);
+            td.insertBefore(div, td.childNodes[0]);
         }
     }
 }
