@@ -44,11 +44,15 @@ router.post('/add', async (context) => {
 
 router.delete('/delete/:id', async (context) => {
     if (context.params && context.params.id) {
+        console.log('id', context.params.id);
         const task = tasks.find(function (task) {
-            return task.id === context.params.id;
+            console.log(task.id, context.params.id);
+            return task.id == context.params.id;
         });
+        console.log(task);
         const index = tasks.indexOf(task);
         tasks.splice(index, 1);
+        console.log(tasks);
         context.response.status = 200;
         context.response.body = 'Item with id ' + context.params.id + ' was deleted';
     } else {
@@ -62,7 +66,7 @@ router.post('/move', async (context) => {
         const body = JSON.parse(await context.request.body().value);
         if (Object.values(State).includes(body.state)) {
             const task = tasks.find(function (task) {
-                return task.id === body.id;
+                return task.id == body.id;
             });
             task.state = body.state;
             context.response.status = 200;
@@ -78,10 +82,6 @@ router.post('/move', async (context) => {
 });
 app.use(
     oakCors()
-    // oakCors({
-    //     origin: "http://127.0.0.1:5500",
-    //     optionsSuccessStatus: 200
-    // }),
 );
 app.use(router.routes());
 await app.listen({port: 8000});
