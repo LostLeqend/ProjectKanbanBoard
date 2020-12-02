@@ -6,6 +6,13 @@ const addTaskDto = {
     state: ''
 }
 
+document.getElementById("txt-taskname").addEventListener("keyup", (event) =>{
+    if(event.keyCode == 13){
+        event.preventDefault();
+        document.getElementById("btn-add").click();
+    }
+});
+
 var addTaskPopup = document.getElementById("add-task-popup");
 
 window.addEventListener('load', async () => {
@@ -54,9 +61,9 @@ function createAddButtons(parentElement, state) {
 
 ///Popup
 function openTaskPopUp(listener) {
-    console.log(listener.target);
     addTaskDto.state = listener.target.id;
     addTaskPopup.style.display = "block";
+    document.getElementById("txt-taskname").focus();
 }
 
 document.getElementById("btn-close").addEventListener('click', () => {
@@ -119,7 +126,6 @@ document.addEventListener("drop", async function (event) {
     }
 }, false);
 
-
 async function addTask(dto) {
     await fetch('http://localhost:8000/add', {
         method: 'POST',
@@ -130,7 +136,6 @@ async function addTask(dto) {
 }
 
 async function deleteTask(id) {
-    console.log(id);
     await fetch('http://localhost:8000/delete/' + id, {
         method: 'DELETE',
     });
