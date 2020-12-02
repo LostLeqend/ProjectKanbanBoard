@@ -44,15 +44,12 @@ router.post('/add', async (context) => {
 
 router.delete('/delete/:id', async (context) => {
     if (context.params && context.params.id) {
-        console.log('id', context.params.id);
         const task = tasks.find(function (task) {
             console.log(task.id, context.params.id);
             return task.id == context.params.id;
         });
-        console.log(task);
         const index = tasks.indexOf(task);
         tasks.splice(index, 1);
-        console.log(tasks);
         context.response.status = 200;
         context.response.body = 'Item with id ' + context.params.id + ' was deleted';
     } else {
