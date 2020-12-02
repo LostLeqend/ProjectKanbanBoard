@@ -1,5 +1,5 @@
 # ProjectKanbanBoard
-Modul 133
+Modul 133 Project from Philip Baumann and Raphael Härtel
 
 ## How to start
 - Open index html or start localhost
