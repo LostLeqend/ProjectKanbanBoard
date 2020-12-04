@@ -144,7 +144,7 @@ async function deleteTask(id) {
 
 async function moveTask(data) {
     await fetch('http://localhost:8000/move', {
-        method: 'POST',
+        method: 'PUT',
         body: JSON.stringify(data)
     });
 }

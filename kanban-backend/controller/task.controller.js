@@ -30,7 +30,7 @@ router.post('/add', async (context) => {
             task.id = id;
             tasks.push(task);
             id++;
-            context.response.status = 200;
+            context.response.status = 201;
             context.response.body = 'Task with id: ' + id + 'has been created';
         } else {
             context.response.status = 400;
@@ -45,7 +45,6 @@ router.post('/add', async (context) => {
 router.delete('/delete/:id', async (context) => {
     if (context.params && context.params.id) {
         const task = tasks.find(function (task) {
-            console.log(task.id, context.params.id);
             return task.id == context.params.id;
         });
         const index = tasks.indexOf(task);
@@ -58,7 +57,7 @@ router.delete('/delete/:id', async (context) => {
     }
 });
 
-router.post('/move', async (context) => {
+router.put('/move', async (context) => {
     if (context.request.hasBody) {
         const body = JSON.parse(await context.request.body().value);
         if (Object.values(State).includes(body.state)) {
